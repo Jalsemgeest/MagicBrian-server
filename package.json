@@ -1,0 +1,31 @@
+{
+  "name": "magic-brian-server",
+  "version": "1.0.0",
+  "description": "The server backend for Magic Brian.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "build-docker": "docker build -t jake/magic-brian-server .",
+    "run-docker": "docker run -p 49160:8080 -d jake/magic-brian-server",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jalsemgeest/MagicBrian-server.git"
+  },
+  "keywords": [
+    "magic",
+    "the",
+    "gathering"
+  ],
+  "author": "Jake Alsemgeest",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Jalsemgeest/MagicBrian-server/issues"
+  },
+  "homepage": "https://github.com/Jalsemgeest/MagicBrian-server#readme",
+  "dependencies": {
+    "express": "^4.16.3",
+    "mongodb": "^3.0.7"
+  }
+}

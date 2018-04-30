@@ -21,9 +21,6 @@ class Mongo {
 
       const Card = models.card(mongoose);
 
-      console.log('Looking to save...');
-      console.log(data);
-
       Card.create(data, (err, results) => {
         if (err) {
           // TODO: Log the error.

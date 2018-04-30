@@ -34,8 +34,6 @@ class Search {
         parsedResponse = body;
       }
 
-      console.log('--------------------------------------------------------------------------------');
-
       // Parse the card responses.
       cardSearch.parse(parsedResponse);
 
@@ -50,8 +48,6 @@ class Search {
 
   static cards(req, res) {
     const cardSearch = new CardSearch(req);
-
-    console.log(cardSearch);
 
     const mongo = new Mongo();
     mongo.findCards(cardSearch.query, (err, cards) => {

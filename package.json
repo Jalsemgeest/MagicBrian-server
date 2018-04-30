@@ -27,7 +27,11 @@
   "dependencies": {
     "body-parser": "^1.18.2",
     "cookie-parser": "^1.4.3",
+    "escape-string-regexp": "^1.0.5",
     "express": "^4.16.3",
-    "mongodb": "^3.0.7"
+    "jsonwebtoken": "^8.2.1",
+    "mongodb": "^3.0.7",
+    "mongoose": "^5.0.16",
+    "request": "^2.85.0"
   }
 }

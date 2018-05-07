@@ -1,10 +1,13 @@
+// Used to validate input from the user.
+const validator = require('validator');
+// The model for the card.
 const Card = require('./card');
 
 class CardSearch {
   constructor(data) {
     // ex. Oloro
     this.query = {
-      name: data.body.name,
+      name: validator.escape(data.body.name),
     };
 
     // Array we will populate with values to send back to client.

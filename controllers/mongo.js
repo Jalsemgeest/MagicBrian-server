@@ -2,6 +2,7 @@ const config = require('../magic-brian-server-config');
 // const mongoose = require('mongoose');
 const MongooseModels = require('../models/mongooseModels');
 const escape = require('escape-string-regexp');
+const AuthManager = require('../auth/manager');
 
 class Mongo {
   /**
@@ -43,7 +44,7 @@ class Mongo {
     const Card = models.card(mongoose);
 
     const regex = escape(data.name);
-    const expression = new RegExp(regex, 'g');
+    const expression = new RegExp(regex, 'i');
     const query = {
       name: expression,
     };
@@ -53,6 +54,99 @@ class Mongo {
     });
   }
 
+  /**
+   *  Check if a user exists in the database.
+   */ 
+  getUser(email, callback = ()=>{}) {
+    const models = new MongooseModels();
+
+    const mongoose = require('mongoose');
+    mongoose.connect(`mongodb://localhost/MagicBrian`);
+
+    const User = models.user(mongoose);
+
+    const query = {
+      email: email,
+    };
+
+    User.find(query, null, (err, user) => {
+      mongoose.connection.close();
+      callback(err, user);
+    });
+   }
+
+  /**
+   *  Adds a user to the database..
+   */ 
+  createUser(registration, callback = ()=>{}) {
+    const models = new MongooseModels();
+
+    const mongoose = require('mongoose');
+    mongoose.connect(`mongodb://localhost/MagicBrian`);
+
+    const User = models.user(mongoose);
+
+    User.create({
+      email: registration.email,
+      passwordHash: registration.password,
+      createdDate: Date.now(),
+      lastLogin: Date.now(),
+    }, (err, user) => {
+      mongoose.connection.close();
+      callback(err, user);
+    });
+  }
+
+  generateAuth({ user, userInfo }, callback = ()=>{}) {
+    const models = new MongooseModels();
+
+    const mongoose = require('mongoose');
+    mongoose.connect(`mongodb://localhost/MagicBrian`);
+
+    const Auth = models.auth(mongoose);
+    const tokens = AuthManager.generate({ userId: user._id, email: user.email, ipHash: userInfo.ipHash });
+
+    console.log('Tokens:');
+    console.log(tokens);
+
+    if (tokens.error) {
+      callback({ error: tokens.error, message: 'Failed to generate the tokens.' }, null);
+      return;
+    }
+
+    console.log(user);
+    Auth.create({
+      userId: user._id,
+      ipHash: userInfo.ipHash,
+      auth: tokens.auth,
+      refreshToken: tokens.refresh,
+      generated: Date.now(),
+      lastUsed: Date.now(),
+    }, (err, auth) => {
+      mongoose.connection.close();
+      callback(err, auth);
+    });
+  }
+
+  updateAuth({ user, auth }, callback = ()=>{}) {
+    const models = new MongooseModels();
+
+    const mongoose = require('mongoose');
+    mongoose.connect(`mongodb://localhost/MagicBrian`);
+
+    const Auth = models.auth(mongoose);
+
+    const tokens = AuthManager.generate({ userId: user._id, email: user.email, ipHash: auth.ipHash });
+
+    Auth.update({ ipHash: auth.auth.ipHash, email: user.email, userId: user._id },
+                { $set: { auth: tokens.auth, lastUsed: Date.now() }},
+                (err, updatedAuth) => {
+                  console.log(err);
+                  console.log(updatedAuth);
+                  mongoose.connection.close();
+                  callback(err, { auth: tokens.auth });
+                });
+  }
 }
 
 module.exports = Mongo;

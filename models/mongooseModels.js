@@ -40,6 +40,42 @@ class MongooseModels {
     }
     return schemas["card"];
   }
+
+  /**
+   *  This will return the mongoose model for the user collection.
+   *  @param mongoose This is an instance of the mongoose connection.
+   */
+  user(mongoose) {
+    if (!schemas["user"]) {
+      schemas["user"] = mongoose.model('User', {
+        id: String,
+        email: String,
+        passwordHash: String,
+        createdDate: Date,
+        lastLogin: Date,
+      })
+    }
+    return schemas["user"];
+  }
+
+  /**
+   *  This will return the mongoose model for the auth collection.
+   *  @param mongoose This is an instance of the mongoose connection.
+   */
+  auth(mongoose) {
+    if (!schemas["auth"]) {
+      schemas["auth"] = mongoose.model('Auth', {
+        id: String,
+        userId: String,
+        ipHash: String,
+        auth: String,
+        refreshToken: String,
+        generated: Date,
+        lastUsed: Date,
+      })
+    }
+    return schemas["auth"];
+  }
 }
 
 module.exports = MongooseModels;

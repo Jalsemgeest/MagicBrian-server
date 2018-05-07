@@ -1,5 +1,6 @@
 const index = require('./controllers/index');
 const search = require('./controllers/search');
+const user = require('./controllers/user');
 
 class Routes {
   static setup(app) {
@@ -11,6 +12,12 @@ class Routes {
 
     // Search mongo for cards.
     app.post('/cards', search.cards);
+
+    // Register a user.
+    app.post('/register', user.register);
+
+    // Confirm/Update auth for a user
+    app.post('/auth', user.auth);
   }
 }
 

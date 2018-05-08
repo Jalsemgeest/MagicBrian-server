@@ -10,12 +10,23 @@ const Mongo = require('./mongo');
 const Auth = require('../models/auth');
 // Registration model object.
 const Registration = require('../models/registration');
+// Login model object.
+const Login = require('../models/login');
+// Logout model object.
+const Logout = require('../models/logout');
 
 
 class User {
 
   static auth(req, res) {
     const auth = new Auth(req);
+
+    console.log(auth);
+    console.log(auth.validAuth());
+    console.log(auth.validRefresh());
+
+    // Check if the auth will expire soon (in the next day), if so update the auth just to ensure the user won't be using
+    // an expired auth during a session.
 
     if (auth.validAuth()) {
       // Let the frontend know it's still valid.
@@ -39,6 +50,9 @@ class User {
 
         const foundUser = user[0];
 
+        console.log('The user!');
+        console.log(user);
+
         mongo.updateAuth({ user:foundUser, auth }, (err, newAuth) => {
           if (err) {
             res.status(400).send({ error: err, message: 'There was an error updating auth for the user.' });
@@ -54,6 +68,69 @@ class User {
       res.status(401).send({ message: 'User has been signed out. Please sign in again.' });
       return;
     }
+  }
+
+  static login(req, res) {
+    const login = new Login(req);
+
+    console.log(login);
+
+    const mongo = new Mongo();
+
+    // Confirm that the user has a valid email and password.
+    mongo.userLogin(login, (userLoginErr, userList) => {
+      if (userLoginErr) {
+        console.log(userLoginErr);
+        res.status(500).send({ error: userLoginErr, message: 'Error validating user.' });
+        return;
+      }
+      console.log('The user!');
+      console.log(userList);
+      if (!userList.length) {
+        res.send({ message: 'Invalid email or password.' });
+        return;
+      }
+
+      const user = userList[0];
+
+      // Delete the old auth for the user with the same ipHash (if any).
+      mongo.deleteAuth({ user, userInfo: login }, (deleteErr, deletedAuth) => {
+        console.log('Deleting auth.');
+        console.log(deleteErr);
+        console.log(deletedAuth);
+        console.log(user);
+
+        // Generate a new auth for the user.
+        mongo.generateAuth({ user, userInfo: login }, (generateAuthErr, auth) => {
+          if (generateAuthErr) {
+            // Failed to generate auth.
+            console.log(generateAuthErr);
+            res.status(500).send({ error: generateAuthErr, message: 'Failed to generate auth for user.' });
+            return;
+          }
+          console.log('Auth');
+          console.log(auth);
+          res.send({ auth: auth.auth, refresh: auth.refreshToken });
+        });
+      });
+    });
+  }
+
+  static logout(req, res) {
+    const logout = new Logout(req);
+
+    const mongo = new Mongo();
+
+    console.log(logout);
+
+    if (!logout.auth || !logout.auth.userId) {
+      res.status(401).send({ message: 'Failed to logout with the current auth.' });
+      return;
+    }
+
+    mongo.deleteAuth({ user: { _id: logout.auth.userId }, userInfo: logout }, (deleteErr, deletedAuth) => {
+      res.send({ logoutSuccess: true });
+    });
   }
 
   static register(req, res) {

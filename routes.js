@@ -16,6 +16,12 @@ class Routes {
     // Register a user.
     app.post('/register', user.register);
 
+    // Login as a user.
+    app.post('/login', user.login);
+
+    // Logout a user and delete auth.
+    app.post('/logout', user.logout);
+
     // Confirm/Update auth for a user
     app.post('/auth', user.auth);
   }

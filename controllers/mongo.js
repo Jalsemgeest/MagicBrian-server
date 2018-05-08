@@ -103,6 +103,9 @@ class Mongo {
     const mongoose = require('mongoose');
     mongoose.connect(`mongodb://localhost/MagicBrian`);
 
+    console.log('Going to generate auth...');
+    console.log(user);
+
     const Auth = models.auth(mongoose);
     const tokens = AuthManager.generate({ userId: user._id, email: user.email, ipHash: userInfo.ipHash });
 
@@ -146,6 +149,34 @@ class Mongo {
                   mongoose.connection.close();
                   callback(err, { auth: tokens.auth });
                 });
+  }
+
+  userLogin(login, callback = ()=>{}) {
+    const models = new MongooseModels();
+
+    const mongoose = require('mongoose');
+    mongoose.connect(`mongodb://localhost/MagicBrian`);
+
+    const User = models.user(mongoose);
+
+    User.find({ email: login.email, passwordHash: login.password }, (err, user) => {
+      mongoose.connection.close();
+      callback(err, user);
+    });
+  }
+
+  deleteAuth({ user, userInfo }, callback = ()=>{}) {
+    const models = new MongooseModels();
+
+    const mongoose = require('mongoose');
+    mongoose.connect(`mongodb://localhost/MagicBrian`);
+
+    const Auth = models.auth(mongoose);
+
+    Auth.remove({ userId: user._id, ipHash: userInfo.ipHash }, (err, result) => {
+      mongoose.connection.close();
+      callback(err, result);
+    });
   }
 }
 

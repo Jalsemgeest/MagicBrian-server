@@ -22,8 +22,10 @@ class AuthManager {
    */
   static generate(user = {}) {
     try {
+      console.log('Generating user...');
+      console.log(user);
       const authToken =
-          jwt.sign(user, config.JWT_SALT, { expiresIn: '1d'});
+          jwt.sign(user, config.JWT_SALT, { expiresIn: '30d' });
       const refreshToken =
           jwt.sign(user, config.JWT_SALT, { expiresIn: '60d' });
       return {

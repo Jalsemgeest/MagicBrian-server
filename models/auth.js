@@ -16,18 +16,19 @@ class Auth {
   }
 
   validAuth() {
-    let authTTL = new Date(0)
+    let authTTL = new Date(0);
     authTTL.setUTCSeconds(this.auth.exp);
     let now = new Date();
-    if (now < authTTL) {
-      return true;
+    let difference = Math.abs(authTTL.getTime() - now.getTime());
+    if (difference < 0 || difference < 86400000) { // Check if it's expired or less than a day to expire.
+      return false;
     }
-    return false;
+    return true;
   }
 
   validRefresh() {
-    let refreshTTL = new Date(0)
-    refreshTTL.setUTCSeconds(this.auth.exp);
+    let refreshTTL = new Date(0);
+    refreshTTL.setUTCSeconds(this.refresh.exp);
     let now = Date.now();
     if (now < refreshTTL) {
       return true;

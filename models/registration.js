@@ -8,6 +8,7 @@ class Registration {
     if (validator.isEmail(validator.escape(data.body.email))) {
       this.email = validator.escape(data.body.email);
     }
+    this.username = validator.escape(data.body.username);
     this.password = crypto.createHmac(config.HASH_ALGORITHM, config.PASSWORD_SECRET)
                       .update(validator.escape(data.body.password))
                       .digest('hex');

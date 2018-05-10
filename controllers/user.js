@@ -30,13 +30,13 @@ class User {
 
     if (auth.validAuth()) {
       // Let the frontend know it's still valid.
-      res.send({ auth: auth.rawAuth, email: auth.email, status: 'VALID_AUTH' });
+      res.send({ auth: auth.rawAuth, username: auth.username, status: 'VALID_AUTH' });
       return;
     } else if (auth.validRefresh()) {
       // Lets generate a new auth for the frontend.
       const mongo = new Mongo();
 
-      mongo.getUser(auth.email, (err, user) => {
+      mongo.getUser(auth.username, (err, user) => {
         if (err) {
           console.log(err);
           res.status(500).send({ error: err, message: 'Error finding the user.' });
@@ -59,7 +59,7 @@ class User {
             return;
           }
 
-          res.send({ auth: newAuth.auth, email: auth.email, status: 'NEW_AUTH_GENERATED' });
+          res.send({ auth: newAuth.auth, username: auth.username, status: 'NEW_AUTH_GENERATED' });
           return;
         });
       });
@@ -77,7 +77,7 @@ class User {
 
     const mongo = new Mongo();
 
-    // Confirm that the user has a valid email and password.
+    // Confirm that the user has a valid username and password.
     mongo.userLogin(login, (userLoginErr, userList) => {
       if (userLoginErr) {
         console.log(userLoginErr);
@@ -87,7 +87,7 @@ class User {
       console.log('The user!');
       console.log(userList);
       if (!userList.length) {
-        res.send({ message: 'Invalid email or password.' });
+        res.send({ message: 'Invalid username or password.' });
         return;
       }
 
@@ -148,7 +148,7 @@ class User {
 
     const mongo = new Mongo();
 
-    mongo.getUser(registration.email, (err, user) => {
+    mongo.getUser(registration.username, (err, user) => {
       if (err) {
         console.log('We already have a user?');
         console.log(err);

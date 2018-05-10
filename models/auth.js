@@ -6,9 +6,7 @@ const authManager = require('../auth/manager');
 
 class Auth {
   constructor(data) {
-    if (validator.isEmail(validator.escape(data.body.email))) {
-      this.email = validator.escape(data.body.email);
-    }
+    this.username = validator.escape(data.body.username);
     this.auth = authManager.validate(validator.escape(data.body.auth));
     this.refresh = authManager.validate(validator.escape(data.body.refresh));
     this.rawAuth = validator.escape(data.body.auth);

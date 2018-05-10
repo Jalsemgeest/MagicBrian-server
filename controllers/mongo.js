@@ -56,8 +56,8 @@ class Mongo {
 
   /**
    *  Check if a user exists in the database.
-   */ 
-  getUser(email, callback = ()=>{}) {
+   */
+  getUser(username, callback = ()=>{}) {
     const models = new MongooseModels();
 
     const mongoose = require('mongoose');
@@ -66,7 +66,7 @@ class Mongo {
     const User = models.user(mongoose);
 
     const query = {
-      email: email,
+      username: username,
     };
 
     User.find(query, null, (err, user) => {
@@ -77,7 +77,7 @@ class Mongo {
 
   /**
    *  Adds a user to the database..
-   */ 
+   */
   createUser(registration, callback = ()=>{}) {
     const models = new MongooseModels();
 
@@ -87,6 +87,7 @@ class Mongo {
     const User = models.user(mongoose);
 
     User.create({
+      username: registration.username,
       email: registration.email,
       passwordHash: registration.password,
       createdDate: Date.now(),
@@ -107,7 +108,7 @@ class Mongo {
     console.log(user);
 
     const Auth = models.auth(mongoose);
-    const tokens = AuthManager.generate({ userId: user._id, email: user.email, ipHash: userInfo.ipHash });
+    const tokens = AuthManager.generate({ userId: user._id, username: user.username, ipHash: userInfo.ipHash });
 
     console.log('Tokens:');
     console.log(tokens);
@@ -139,9 +140,9 @@ class Mongo {
 
     const Auth = models.auth(mongoose);
 
-    const tokens = AuthManager.generate({ userId: user._id, email: user.email, ipHash: auth.ipHash });
+    const tokens = AuthManager.generate({ userId: user._id, username: user.username, ipHash: auth.ipHash });
 
-    Auth.update({ ipHash: auth.auth.ipHash, email: user.email, userId: user._id },
+    Auth.update({ ipHash: auth.auth.ipHash, username: user.username, userId: user._id },
                 { $set: { auth: tokens.auth, lastUsed: Date.now() }},
                 (err, updatedAuth) => {
                   console.log(err);
@@ -159,7 +160,7 @@ class Mongo {
 
     const User = models.user(mongoose);
 
-    User.find({ email: login.email, passwordHash: login.password }, (err, user) => {
+    User.find({ username: login.username, passwordHash: login.password }, (err, user) => {
       mongoose.connection.close();
       callback(err, user);
     });

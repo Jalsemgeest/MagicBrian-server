@@ -6,9 +6,7 @@ const authManager = require('../auth/manager');
 
 class Logout {
   constructor(data) {
-    if (validator.isEmail(validator.escape(data.body.email))) {
-      this.email = validator.escape(data.body.email);
-    }
+    this.username = validator.escape(data.body.username);
     this.auth = authManager.validate(validator.escape(data.body.auth));
     this.ipHash = crypto.createHmac(config.HASH_ALGORITHM, config.IP_SECRET)
                       .update(validator.escape(data.connection.remoteAddress))

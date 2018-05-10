@@ -49,6 +49,7 @@ class MongooseModels {
     if (!schemas["user"]) {
       schemas["user"] = mongoose.model('User', {
         id: String,
+        username: String,
         email: String,
         passwordHash: String,
         createdDate: Date,
